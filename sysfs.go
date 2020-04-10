@@ -44,7 +44,7 @@ func exportGPIO(p Pin) error {
 	}
 	defer export.Close()
 
-	_, err := export.Write([]byte(strconv.Itoa(int(p.Number))))
+	_, err = export.Write([]byte(strconv.Itoa(int(p.Number))))
 	if err != nil {
 		return fmt.Errorf("Unable to export gpio, write failed\n. Error: %s", err.Error())
 	}
@@ -59,7 +59,7 @@ func unexportGPIO(p Pin) error {
 	}
 	defer export.Close()
 
-	_, err := export.Write([]byte(strconv.Itoa(int(p.Number))))
+	_, err = export.Write([]byte(strconv.Itoa(int(p.Number))))
 	if err != nil {
 		return fmt.Errorf("Unable to export gpio, write failed\n. Error: %s", err.Error())
 	}
@@ -70,12 +70,10 @@ func unexportGPIO(p Pin) error {
 func setDirection(p Pin, d direction, initialValue uint) error {
 	dir, err := os.OpenFile(fmt.Sprintf("/sys/class/gpio/gpio%d/direction", p.Number), os.O_WRONLY, 0600)
 	if err != nil {
-		fmt.Printf("failed to open gpio %d direction file for writing\n", p.Number)
-		os.Exit(1)
+		return fmt.Errorf("failed to open gpio %d direction file for writing\n. Error %s", p.Number, err.Error())
 	}
 	defer dir.Close()
 
-	var err Error
 	switch {
 	case d == inDirection:
 		_, err = dir.Write([]byte("in"))
@@ -90,15 +88,13 @@ func setDirection(p Pin, d direction, initialValue uint) error {
 	return err
 }
 
-func setEdgeTrigger(p Pin, e Edge) {
+func setEdgeTrigger(p Pin, e Edge) error {
 	edge, err := os.OpenFile(fmt.Sprintf("/sys/class/gpio/gpio%d/edge", p.Number), os.O_WRONLY, 0600)
 	if err != nil {
 		fmt.Printf("failed to open gpio %d edge file for writing\n", p.Number)
 		os.Exit(1)
 	}
 	defer edge.Close()
-
-	var err error
 
 	switch e {
 	case EdgeNone:
@@ -122,8 +118,6 @@ func setLogicLevel(p Pin, l LogicLevel) error {
 		return err
 	}
 	defer level.Close()
-
-	var err error
 
 	switch l {
 	case ActiveHigh:

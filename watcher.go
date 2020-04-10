@@ -211,14 +211,20 @@ func (w *Watcher) AddPin(p uint) {
 // Edges can be configured to be either rising, falling, or both.
 // Logic level can be active high or active low.
 // The pin provided should be the pin known by the kernel.
-func (w *Watcher) AddPinWithEdgeAndLogic(p uint, edge Edge, logicLevel LogicLevel) {
-	pin := NewInput(p)
+func (w *Watcher) AddPinWithEdgeAndLogic(p uint, edge Edge, logicLevel LogicLevel) error {
+	pin, err := NewInput(p)
+	if err != nil {
+		return err
+	}
+
 	setLogicLevel(pin, logicLevel)
 	setEdgeTrigger(pin, edge)
 	w.cmdChan <- watcherCmd{
 		pin:    pin,
 		action: watcherAdd,
 	}
+
+	return nil
 }
 
 // RemovePin stops the watcher from watching the specified pin
