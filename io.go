@@ -19,12 +19,9 @@ func NewInput(p uint) (Pin, error) {
 		Number: p,
 	}
 
-	err := exportGPIO(pin)
-	if err != nil {
-		return pin, err
-	}
+	exportGPIO(pin)
 
-	time.Sleep(10 * time.Millisecond)
+	time.Sleep(50 * time.Millisecond)
 	pin.direction = inDirection
 	if err := setDirection(pin, inDirection, 0); err != nil {
 		return pin, err
@@ -40,12 +37,9 @@ func NewOutput(p uint, initHigh bool) (Pin, error) {
 		Number: p,
 	}
 
-	err := exportGPIO(pin)
-	if err != nil {
-		return pin, err
-	}
+	exportGPIO(pin)
 
-	time.Sleep(10 * time.Millisecond)
+	time.Sleep(50 * time.Millisecond)
 	initVal := uint(0)
 	if initHigh {
 		initVal = uint(1)
